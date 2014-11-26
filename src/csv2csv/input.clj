@@ -48,7 +48,7 @@
           sheet (xls/select-sheet pattern workbook)]
       (if (nil? sheet)
         ;; dump a list of available sheetnames and throw an exception
-        (throw-exception-invalid-sheetname! workbook)
+        (throw-exception-invalid-sheetname! workbook sheetname)
         sheet)
       )))
 
