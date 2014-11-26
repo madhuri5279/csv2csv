@@ -1,6 +1,11 @@
 (ns csv2csv.core-test
-  (:use [clojure.test :refer :all]
-        [csv2csv.core :as core]))
+  (:use [clojure.test :refer :all])
+  (:require [csv2csv.core :as core]
+            [csv2csv.input :as input]
+            [csv2csv.skip :as skip]
+            [csv2csv.tokenize :as tokenize]
+            [csv2csv.tx :as tx]
+            [csv2csv.repeat-down :as repeat]))
 
 
 (defn extract-airport []
@@ -23,16 +28,16 @@
    ;; each functions take ^Config and ^Line are arguments and returns a boolean
    ;; or (line-contains? "identifier|total") use string 
    ;; or (line-contains? #"identifier|total") use regex
-   :skip [(line-contains? "identifier") 
-          (line-contains? "total")
-          (line-empty?)]
+   :skip [(skip/line-contains? "identifier") 
+          (skip/line-contains? "total")
+          (skip/line-empty?)]
    ;;:skip (line-contains? #"identifier|total")
 
-   :tokens [{:index 0 :name "id" :tx [(convert-to-int) (skip-if-equal 0)]}
+   :tokens [{:index 0 :name "id" :tx [(tx/convert-to-int) (tx/skip-if-equal 0)]}
             {:index 1 :name "airport" :tx (extract-airport)}
             {:index 1 :name "country" :tx (extract-country)}
-            {:index 2 :name "total" :tx (convert-to-int)}
-            {:index 3 :name "source" :repeat-down (empty-cell?) :tx [(trim) (skip-if-equal "--")]}
+            {:index 2 :name "total" :tx (tx/convert-to-int)}
+            {:index 3 :name "source" :repeat-down (repeat/empty-cell?) :tx [(tx/trim) (tx/skip-if-equal "--")]}
             {:name "date" :value "now"}
             ]
 
@@ -59,12 +64,12 @@
 
 (deftest a-test
   (testing "simple specification"
-    (let [spec* (create-spec spec)
-          lines* (strings-to-lines (:config spec) simple-lines)
-          filtered-lines (skip-lines spec* lines*)
-          rows (lines-to-rows spec* filtered-lines)
-          rows* (repeat-down-rows spec* rows)
-          rows** (process-rows spec* rows*)
+    (let [spec* (core/create-spec spec)
+          lines* (input/strings-to-lines (:config spec) simple-lines)
+          filtered-lines (skip/skip-lines spec* lines*)
+          rows (tokenize/lines-to-rows spec* filtered-lines)
+          rows* (repeat/repeat-down-rows spec* rows)
+          rows** (tx/process-rows spec* rows*)
           ]
       (are [x y] (= x y)
            8 (count lines*)
