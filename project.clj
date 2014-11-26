@@ -1,6 +1,6 @@
-(defproject csv2csv "0.1.0-SNAPSHOT"
+(defproject csv2csv "0.1.0"
   :description "transform one xls/xlsx/txt/csv format into another csv format"
-  :url "http://example.com/FIXME"
+  :url "http://github.com/pauldeschacht/csv2csv"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.5.1"]
@@ -14,6 +14,4 @@
                                               com.sun.jdmk/jmxtools
                                               com.sun.jmx/jmxri]]
 
-                 ]
-
-  :main csv2csv.core)
+                 ])
