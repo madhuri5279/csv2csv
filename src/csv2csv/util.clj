@@ -1,6 +1,5 @@
 (ns csv2csv.util
-  (:require [csv2csv.core :as core])
-  (:require [csv2csv.tokenize :as tokenize]))
+  (:require [csv2csv.core :as core]))
 
 (defn substring? [sub s]
   (.contains s sub))
