@@ -50,7 +50,7 @@
   (Config. (:input-separator config \,)
            (:input-quote config \")
            (:output-separator config \^)
-           (:thousand-sepatator config nil)
+           (:thousand-separator config nil)
            (:decimal-separator config nil)))
 
 (defn- create-skipspecs [skip]
