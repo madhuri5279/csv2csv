@@ -4,8 +4,9 @@
             [csv2csv.input :as input]
             [csv2csv.skip :as skip]
             [csv2csv.tokenize :as tokenize]
+            [csv2csv.repeat-down :as repeat]
             [csv2csv.tx :as tx]
-            [csv2csv.repeat-down :as repeat]))
+            [csv2csv.transpose :as transpose]))
 
 
 (defn extract-airport []
@@ -70,16 +71,18 @@
           rows (tokenize/lines-to-rows spec* filtered-lines)
           rows* (repeat/repeat-down-rows spec* rows)
           rows** (tx/process-rows spec* rows*)
+          rows*** (transpose/transpose-rows spec* rows**)
           ]
       (are [x y] (= x y)
            8 (count lines*)
            5 (count filtered-lines)
            5 (count rows*)
            4 (count rows**)
-           "BRU" (get-value-cell (first rows**) "airport")
-           "BE"  (get-value-cell (first rows**) "country")
-           "WEB" (get-value-cell (first rows**) "source")
-           1000 (get-value-cell (first rows**) "total")
+           4 (count rows***)
+           "BRU" (get-value-cell (first rows***) "airport")
+           "BE"  (get-value-cell (first rows***) "country")
+           "WEB" (get-value-cell (first rows***) "source")
+           1000 (get-value-cell (first rows***) "total")
            
            "MAD" (get-value-cell (last rows**) "airport")
            "ES"  (get-value-cell (last rows**) "country")

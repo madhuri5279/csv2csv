@@ -39,8 +39,11 @@
 
 
 (defn transpose-rows [^csv2csv.core.Spec spec rows]
-  (flatten
-   (map #(transpose-row (:transpose spec) %) rows)))
+  (if (or (nil? (:transpose spec))
+          (nil? (get-in spec [:transpose :columns])))
+    rows
+    (flatten
+     (map #(transpose-row (:transpose spec) %) rows))))
 
 
 
