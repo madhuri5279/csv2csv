@@ -51,6 +51,7 @@
             {:index 2 :name "total" :tx (tx/convert-to-int)}
             {:index 3 :name "source" :repeat-down (repeat/empty-cell?) :tx [(tx/trim) (tx/skip-if-equal "--")]}
             {:name "date" :value "now"}
+            {:name "copy" :tx [(tx/copy-from-cell "source") (tx/trim)]} ;; cells are process in parallel (map), so apply trim
             ]
 
    })
@@ -82,11 +83,13 @@
            "BE"  (get-value-cell (first rows***) "country")
            "WEB" (get-value-cell (first rows***) "source")
            1000 (get-value-cell (first rows***) "total")
+           "WEB" (get-value-cell (first rows***) "copy")
            
            "MAD" (get-value-cell (last rows**) "airport")
            "ES"  (get-value-cell (last rows**) "country")
            "FILE" (get-value-cell (last rows**) "source")
            4000 (get-value-cell (last rows**) "total")
+           "FILE" (get-value-cell (last rows**) "copy")
            ))))
 
 

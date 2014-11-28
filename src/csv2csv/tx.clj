@@ -42,6 +42,10 @@
   (fn [^csv2csv.core.Config config ^csv2csv.core.Cell cell ^csv2csv.core.Row row]
     (clojure.string/trim (:value cell))))
 
+(defn copy-from-cell [source-cell-name]
+  (fn [^csv2csv.core.Config config ^csv2csv.core.Cell cell ^csv2csv.core.Row row]
+    (when-let [source-cell (util/get-cell-with-name source-cell-name row)]
+      (:value source-cell))))
 ;;
 ;; Cell transformation: [Row] to [Row]
 ;;

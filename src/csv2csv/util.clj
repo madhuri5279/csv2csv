@@ -45,4 +45,9 @@
 (defn get-tokens-with-index [tokens index]
   (filter #(= index (:index %)) tokens))
 
+(defn get-cell-with-name [name ^csv2csv.core.Row row]
+  (->> (:cells row)
+       (filter #(= name (:name %)))
+       (first)))
+
 
