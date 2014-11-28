@@ -17,7 +17,18 @@
   (fn [^csv2csv.core.Config config ^csv2csv.core.Cell cell ^csv2csv.core.Row row]
     (second (clojure.string/split (:value cell) #"-"))))
 
-(def spec
+(def simple-lines
+  ["identifier,airport-country,total,source"
+   ""
+   "1,BRU-BE,1000,WEB  "
+   "2,CDG-FR,2000,"
+   "3,FRA-DE,3000, FILE"
+   "4,MAD-ES,4000, "
+   "0,------,----,--"
+   "total,,10000"
+   ])
+
+(def simple-spec
   {:config {:input-separator \,
             :output-separator \^
             :decimal-separator \space
@@ -44,18 +55,6 @@
 
    })
 
-(def simple-lines
-  ["identifier,airport-country,total,source"
-   ""
-   "1,BRU-BE,1000,WEB  "
-   "2,CDG-FR,2000,"
-   "3,FRA-DE,3000, FILE"
-   "4,MAD-ES,4000, "
-   "0,------,----,--"
-   "total,,10000"
-   ])
-
-
 (defn- get-value-cell [^csv2csv.core.Row row ^String name]
   (->> row
        :cells
@@ -65,8 +64,8 @@
 
 (deftest a-test
   (testing "simple specification"
-    (let [spec* (core/create-spec spec)
-          lines* (input/strings-to-lines (:config spec) simple-lines)
+    (let [spec* (core/create-spec simple-spec)
+          lines* (input/strings-to-lines (:config spec*) simple-lines)
           filtered-lines (skip/skip-lines spec* lines*)
           rows (tokenize/lines-to-rows spec* filtered-lines)
           rows* (repeat/repeat-down-rows spec* rows)
@@ -91,4 +90,52 @@
            ))))
 
 
+(def transpose-lines
+  ["origin, 1, 2, 3, 4"
+   "A     ,A1,A2,A3,A4"
+   "B     ,B1,B2,B3,B4"
+   "C     ,C1,C2,C3,C4"
+   ])
 
+(def transpose-spec
+  {:config {:input-separator \,
+            :output-separator \^
+            :decimal-separator \space
+            }
+
+   :tokens [{:index 0 :name "origin" :tx [(tx/trim) (tx/skip-if-equal "origin")]}
+            {:index 1 :name "1" :tx (tx/trim)}
+            {:index 2 :name "2" :tx (tx/trim)}
+            {:index 3 :name "3" :tx (tx/trim)}
+            {:index 4 :name "4" :tx (tx/trim)}
+           
+            ]
+   :transpose {:header-name "destination"
+               :value-name "position"
+               :columns ["1" "2" "3" "4"]}
+   
+   })
+
+(deftest transpose
+  (testing "transposing some columns"
+        (let [spec* (core/create-spec transpose-spec)
+          lines* (input/strings-to-lines (:config spec*) transpose-lines)
+          filtered-lines (skip/skip-lines spec* lines*)
+          rows (tokenize/lines-to-rows spec* filtered-lines)
+          rows* (repeat/repeat-down-rows spec* rows)
+          rows** (tx/process-rows spec* rows*)
+          rows*** (transpose/transpose-rows spec* rows**)
+          ]
+      (are [x y] (= x y)
+           4 (count lines*)
+           4 (count filtered-lines)
+           4 (count rows*)
+           3 (count rows**)
+           12 (count rows***)
+           "A" (get-value-cell (first rows***) "origin")
+           "1" (get-value-cell (first rows***) "destination")
+           "A1"  (get-value-cell (first rows***) "position")
+
+           "C" (get-value-cell (last rows***) "origin")
+           "4" (get-value-cell (last rows***) "destination")
+           "C4"  (get-value-cell (last rows***) "position")))))
