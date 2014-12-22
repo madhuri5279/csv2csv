@@ -20,6 +20,21 @@
       (fs config line))
     ))
 
+(defn compose-stop-functions [fs]
+  (if (vector? fs)
+    (fn [^csv2csv.core.Config config ^csv2csv.core.Line line]
+      (loop [value ((first fs) config line) ;; check for special values
+             fs (next fs) ]
+        (if (true? value)
+          false
+          (if (nil? fs)
+            true
+            (recur (and value ((first fs) config line)) (next fs))))
+        ))
+    (fn [^csv2csv.core.Config config ^csv2csv.core.Line line]
+      (not (fs config line)))))
+
+
 (defn compose-functions [fs]
   (if (vector? fs)
     (fn [^csv2csv.core.Config config ^csv2csv.core.Cell cell ^csv2csv.core.Row row]

@@ -28,3 +28,16 @@
          (remove #(f config %) lines))
        lines
        )))
+
+;;
+;; stop processing the lines once a :stop function becomes true
+;;
+(defn stop-lines
+  ([^csv2csv.core.Spec spec lines]
+     (stop-lines (:config spec) (:stop spec) lines))
+  ([^csv2csv.core.Spec config ^csv2csv.core.StopSpec stopspec lines]
+     (if (util/is-functions? (:fn stopspec))
+       (let [f (util/compose-stop-functions (:fn stopspec))]
+         (take-while #(f config %) lines))
+       lines
+       )))

@@ -17,6 +17,8 @@
 
 (defrecord SkipSpec [fn])
 
+(defrecord StopSpec [fn])
+
 (defrecord TokenSpec [^Integer index
                       ^String name
                       value
@@ -30,6 +32,7 @@
 
 (defrecord Spec [^Config config
                  skip
+                 stop
                  tokens
                  ^TransposeSpec transpose])
 
@@ -56,6 +59,9 @@
 (defn- create-skipspecs [skip]
   (SkipSpec. skip))
 
+(defn- create-stopspecs [stop]
+  (StopSpec. stop))
+
 (defn- create-tokenspecs [tokens]
   (map (fn [token]
          (TokenSpec. (:index token)
@@ -72,6 +78,7 @@
 
 (defn create-spec [spec]
   (Spec. (create-config (:config spec))
-                       (create-skipspecs (:skip spec))
-                       (create-tokenspecs (:tokens spec))
-                       (create-transposespec (:transpose spec))))
+         (create-skipspecs (:skip spec))
+         (create-stopspecs (:stop spec))
+         (create-tokenspecs (:tokens spec))
+         (create-transposespec (:transpose spec))))

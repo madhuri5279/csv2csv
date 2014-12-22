@@ -26,6 +26,9 @@
    "4,MAD-ES,4000, "
    "0,------,----,--"
    "total,,10000"
+   "Comment"
+   "5,NCE-BOS,1000,"
+   ""
    ])
 
 (def simple-spec
@@ -45,6 +48,9 @@
           (skip/line-empty?)]
    ;;:skip (line-contains? #"identifier|total")
 
+;;   :stop (skip/line-contains? "Comment")
+   :stop [(skip/line-contains? "Comment")]
+   
    :tokens [{:index 0 :name "id" :tx [(tx/convert-to-int) (tx/skip-if-equal 0)]}
             {:index 1 :name "airport" :tx (extract-airport)}
             {:index 1 :name "country" :tx (extract-country)}
@@ -68,14 +74,25 @@
     (let [spec* (core/create-spec simple-spec)
           lines* (input/strings-to-lines (:config spec*) simple-lines)
           filtered-lines (skip/skip-lines spec* lines*)
-          rows (tokenize/lines-to-rows spec* filtered-lines)
+          filtered-lines* (skip/stop-lines spec* filtered-lines)
+          rows (tokenize/lines-to-rows spec* filtered-lines*)
           rows* (repeat/repeat-down-rows spec* rows)
           rows** (tx/process-rows spec* rows*)
           rows*** (transpose/transpose-rows spec* rows**)
+          ;; spec* (core/create-spec simple-spec)
+          ;; rows*** (->> simple-lines
+          ;;              (input/strings-to-lines (:config spec*))
+          ;;              (skip/skip-lines spec*)
+          ;;              (skip/stop-lines spec*)
+          ;;              (tokenize/lines-to-rows spec*)
+          ;;              (repeat/repeat-down-rows spec*)
+          ;;              (tx/process-rows spec*)
+          ;;              (transpose/transpose-rows spec*))
           ]
       (are [x y] (= x y)
-           8 (count lines*)
-           5 (count filtered-lines)
+           11 (count lines*)
+           7 (count filtered-lines)
+           5 (count filtered-lines*)
            5 (count rows*)
            4 (count rows**)
            4 (count rows***)
