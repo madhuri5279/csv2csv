@@ -159,3 +159,50 @@
            "C" (get-value-cell (last rows***) "origin")
            "4" (get-value-cell (last rows***) "destination")
            "C4"  (get-value-cell (last rows***) "position")))))
+
+(def post-processing-spec
+  {:config {:input-separator \,
+            :output-separator \^
+            :decimal-separator \space
+            }
+
+   :tokens [{:index 0 :name "origin" :tx [(tx/trim) (tx/skip-if-equal "origin")]}
+            {:index 1 :name "1" :tx (tx/trim)}
+            {:index 2 :name "2" :tx (tx/trim)}
+            {:index 3 :name "3" :tx (tx/trim)}
+            {:index 4 :name "4" :tx (tx/trim)}
+           
+            ]
+   :transpose {:header-name "destination"
+               :value-name "position"
+               :columns ["1" "2" "3" "4"]}
+
+   :post [{:name "destination" :tx [(tx/convert-to-int)]}]
+   
+   })
+
+
+(deftest post-processing
+  (testing "post processing some columns"
+    (let [spec* (core/create-spec post-processing-spec)
+          lines* (input/strings-to-lines (:config spec*) transpose-lines)
+          filtered-lines (skip/skip-lines spec* lines*)
+          rows (tokenize/lines-to-rows spec* filtered-lines)
+          rows* (repeat/repeat-down-rows spec* rows)
+          rows** (tx/process-rows spec* rows*)
+          rows*** (transpose/transpose-rows spec* rows**)
+          rows**** (tx/post-process-rows spec* rows***)
+          ]
+      (are [x y] (= x y)
+           4 (count lines*)
+           4 (count filtered-lines)
+           4 (count rows*)
+           3 (count rows**)
+           12 (count rows***)
+           "A" (get-value-cell (first rows****) "origin")
+           1 (get-value-cell (first rows****) "destination")
+           "A1"  (get-value-cell (first rows****) "position")
+
+           "C" (get-value-cell (last rows****) "origin")
+           4 (get-value-cell (last rows****) "destination")
+           "C4"  (get-value-cell (last rows****) "position")))))

@@ -75,3 +75,23 @@
                  rows)
             )))
 
+
+(defn post-process-rows [^csv2csv.core.Spec spec rows]
+  (let [config (:config spec)
+        tokens (:post spec)]
+    (if (or (nil? tokens)
+            (empty? tokens))
+      rows
+      (remove nil?
+              (map (fn [row]
+                     (let [cells* (map (fn [cell]
+                                         (process-cell config tokens cell row))
+                                       (:cells row))]
+                       (if (some #(= :skip-row (:value %)) cells*)
+                         nil
+                         (csv2csv.core.Row. (:index row)
+                                            cells*))
+                       ))
+                   rows)
+              ))))
+

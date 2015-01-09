@@ -34,7 +34,8 @@
                  skip
                  stop
                  tokens
-                 ^TransposeSpec transpose])
+                 ^TransposeSpec transpose
+                 post])
 
 (defrecord Line [^Integer index
                  ^String str])
@@ -81,4 +82,5 @@
          (create-skipspecs (:skip spec))
          (create-stopspecs (:stop spec))
          (create-tokenspecs (:tokens spec))
-         (create-transposespec (:transpose spec))))
+         (create-transposespec (:transpose spec))
+         (create-tokenspecs (:post spec))))
