@@ -1,4 +1,4 @@
-(defproject org.pauldeschacht/csv2csv "0.1.3"
+(defproject org.pauldeschacht/csv2csv "0.1.4"
   :description "transform one xls/xlsx/txt/csv format into another csv format"
   :url "http://github.com/pauldeschacht/csv2csv"
   :license {:name "Eclipse Public License"
