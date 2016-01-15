@@ -16,6 +16,20 @@
     (or (nil? (:str line))
         (empty? (clojure.string/trim (:str line))))))
 
+
+;;
+;; start of lines
+;;
+(defn start-at-lines
+  ([^csv2csv.core.Spec spec lines]
+     (start-at-lines (:config spec) (:start spec) lines))
+  ([^csv2csv.core.Config config ^csv2csv.core.StartSpec startspec lines]
+     (if (util/is-functions? (:fn startspec))
+       (let [f (util/compose-skip-functions (:fn startspec))]
+         (drop-while #(not (f config %)) lines))
+       lines
+       )))
+
 ;;
 ;; remove Lines using user defined predicates: [Line] to [Line]
 ;;

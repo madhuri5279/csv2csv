@@ -15,6 +15,8 @@
                    ^Character decimal-separator
                    ])
 
+(defrecord StartSpec [fn])
+
 (defrecord SkipSpec [fn])
 
 (defrecord StopSpec [fn])
@@ -31,6 +33,7 @@
                           ])
 
 (defrecord Spec [^Config config
+                 start
                  skip
                  stop
                  tokens
@@ -57,6 +60,9 @@
            (:thousand-separator config nil)
            (:decimal-separator config nil)))
 
+(defn- create-startspecs [start]
+  (StartSpec. start))
+
 (defn- create-skipspecs [skip]
   (SkipSpec. skip))
 
@@ -79,6 +85,7 @@
 
 (defn create-spec [spec]
   (Spec. (create-config (:config spec))
+         (create-startspecs (:start spec))
          (create-skipspecs (:skip spec))
          (create-stopspecs (:stop spec))
          (create-tokenspecs (:tokens spec))
